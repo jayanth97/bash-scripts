@@ -1,0 +1,28 @@
+#! /bin/bash
+
+while getopts "u:h:" opt; do
+    case $opt in
+        u)
+            url=$OPTARG
+            ;;
+        h)
+            echo "Usage: <command name> <option1> <argument 1>"
+            echo "Options :"
+            echo "  -u    : path where the repository is present"
+            exit 0
+            ;;
+        \?)
+            echo "Invalid option: -$OPTARG"
+            exit 1
+            ;;
+        :)
+            echo "Option -$OPTARG requires an argument"
+            exit 1
+            ;;
+        esac
+done
+
+filename=$(echo "${url##*/}")
+sudo curl -s $url -o /var/cache/apt/archives/$filename
+sudo dpkg -i /var/cache/apt/archives/$filename
+sudo apt-get install -f
