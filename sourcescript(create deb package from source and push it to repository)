@@ -1,14 +1,18 @@
 #! /bin/bash
 
-while getopts ":p:hc:" opt; do
+while getopts "p:u:hc:" opt; do
     case $opt in
         p)
             path=$OPTARG
+            ;;
+        u)
+            url=$OPTARG
             ;;
         h)
             echo "Usage: <command name> <option1> <argument 1> <option2> <argument 2>"
             echo "Options :"
             echo "  -p    : path to the source"
+            echo "  -u    : url to the repository"
             echo "  -c    : where under the repository you want to place the package "
             echo "        : you can choose from stable | unstable | testing"
             exit 0
@@ -59,5 +63,5 @@ cd $finaltopath
 make
 echo -ne '\n' | sudo checkinstall -D --install=no
 file=$( ls | grep "deb" )
-confgfile=$(head -n 1 /home/jayanth/Desktop/link.txt)
-s3cmd -P put ./$file $confgfile/$context/
+#confgfile=$(head -n 1 /home/jayanth/Desktop/link.txt)
+s3cmd -P put ./$file $url/$context/
