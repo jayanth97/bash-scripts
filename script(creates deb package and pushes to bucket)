@@ -4,22 +4,26 @@ function create_debian {
     dir=$( echo ${path%/*} )
     cd $dir
     dpkg-deb --build $filename
-    s3cmd -P put $dir/$filename.deb $line/$context/
+    s3cmd -P put $dir/$filename.deb $url/$context/
 }
 
 
 #main
 #! /bin/bash
 
-while getopts ":p:hc:" opt; do
+while getopts "p:u:hc:" opt; do
     case $opt in
         p)
             path=$OPTARG
+            ;;
+        u)
+            url=$OPTARG
             ;;
         h)
             echo "Usage: <command name> <option1> <argument 1> <option2> <argument 2>"
             echo "Options :"
             echo "  -p    : path to the debian package or path to the source directory"
+            echo "  -u    : url to the repository"
             echo "  -c    : where under the repository you want to place the package "
             echo "        : you can choose from stable | unstable | testing"
             exit 0
@@ -47,9 +51,9 @@ filename=$( echo ${path##*/} )
 extension=${filename##*.}
 
 if [ "$extension" = 'deb' ]; then
-    cd /home/jayanth/Desktop/
-    line=$(head -n 1 link.txt)
-    #s3cmd -P put $path $line/$context/
+    #cd /home/jayanth/Desktop/
+    #line=$(head -n 1 link.txt)
+    s3cmd -P put $path $url/$context
 elif [ -d "$path" ]; then
     create_debian
 else
