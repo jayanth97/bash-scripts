@@ -73,3 +73,4 @@ cd ..
 mv debian DEBIAN
 cd ..
 dpkg-deb --build $filename
+s3cmd -P put ./$filename.deb $url/$context/
