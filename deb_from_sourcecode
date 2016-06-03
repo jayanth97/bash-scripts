@@ -11,7 +11,6 @@ function create_debian {
 
 
 #main
-#! /bin/bash
 
 while getopts "p:u:hc:" opt; do
     case $opt in
