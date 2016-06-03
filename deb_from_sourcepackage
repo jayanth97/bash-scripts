@@ -64,6 +64,7 @@ filename=$( echo ${finaltopath##*/})
 packagename=$( echo ${filename%-*})
 
 cd $finaltopath
+hash dh_make 2> /dev/null || sudo apt-get -y install dh-make
 dh_make -f $path
 
 cd debian
@@ -72,5 +73,7 @@ cp $file ./
 cd ..
 mv debian DEBIAN
 cd ..
+hash dpkg 2> /dev/null || sudo apt-get -y install dpkg
 dpkg-deb --build $filename
+hash s3cmd 2> /dev/null || sudo apt-get -y install s3cmd
 s3cmd -P put ./$filename.deb $url/$context/
