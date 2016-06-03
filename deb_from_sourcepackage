@@ -1,7 +1,5 @@
 #! /bin/bash
 
-#! /bin/bash
-
 while getopts "p:f:u:hc:" opt; do
     case $opt in
         p)
@@ -43,23 +41,11 @@ done
 
 tar xf $path
 
-## suppose the path is /home/jayanth/Desktop/nginx-1.6.2.tar.gz
-#  then topath = /home/jayanth/Desktop/nginx-1.6.2.tar
-
 topath=$( echo ${path%.*} )
-
-
-## then finaltopath = /home/jayanth/Desktop/nginx-1.6.2
 
 finaltopath=$( echo ${topath%.*} )
 
-
-## then filename = nginx-1.6.2
-
 filename=$( echo ${finaltopath##*/})
-
-
-## then packagename = nginx
 
 packagename=$( echo ${filename%-*})
 
