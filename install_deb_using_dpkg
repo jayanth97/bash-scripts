@@ -25,5 +25,6 @@ done
 filename=$(echo "${url##*/}")
 hash curl 2> /dev/null || sudo apt-get install curl
 sudo curl -s $url -o /var/cache/apt/archives/$filename
+hash dpkg 2> /dev/null || sudo apt-get -y install dpkg
 sudo dpkg -i /var/cache/apt/archives/$filename
 sudo apt-get install -f
