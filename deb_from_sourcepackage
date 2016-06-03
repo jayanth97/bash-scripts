@@ -1,5 +1,7 @@
 #! /bin/bash
 
+#! /bin/bash
+
 while getopts "p:f:u:hc:" opt; do
     case $opt in
         p)
@@ -41,11 +43,23 @@ done
 
 tar xf $path
 
+## suppose the path is /home/jayanth/Desktop/nginx-1.6.2.tar.gz
+#  then topath = /home/jayanth/Desktop/nginx-1.6.2.tar
+
 topath=$( echo ${path%.*} )
+
+
+## then finaltopath = /home/jayanth/Desktop/nginx-1.6.2
 
 finaltopath=$( echo ${topath%.*} )
 
+
+## then filename = nginx-1.6.2
+
 filename=$( echo ${finaltopath##*/})
+
+
+## then packagename = nginx
 
 packagename=$( echo ${filename%-*})
 
@@ -61,5 +75,10 @@ mv debian DEBIAN
 cd ..
 hash dpkg 2> /dev/null || sudo apt-get -y install dpkg
 dpkg-deb --build $filename
+packagename=$( grep "Package" "$file" | cut -d' ' -f2 )
+packageversion=$( grep "Version" "$file" | cut -d' ' -f2 )
+packagearchitecture=$( grep "Architecture" "$file" | cut -d' ' -f2 )
+out=$(echo "$packagename"_"$packageversion"_"$packagearchitecture")
+mv $filename.deb $out.deb
 hash s3cmd 2> /dev/null || sudo apt-get -y install s3cmd
-s3cmd -P put ./$filename.deb $url/$context/
+s3cmd -P put ./$out.deb $url/$context/
