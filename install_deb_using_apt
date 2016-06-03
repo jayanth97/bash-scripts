@@ -25,22 +25,12 @@ while getopts "u:n:h" opt; do
         esac
 done
 
-## suppose path is s3://repository.kenalyse.io/my-repository/stable/helloe_1.1-1_all.deb
-
-## then path = s3://repository.kenalyse.io/my-repository/stable
 
 path=${url%/*}
-#echo $path
-
-##then dir = stable
 
 dir=${path##*/}
-#echo $dir
-
-##then temp = s3://repository.kenalyse.io/my-repository
 
 temp=${path%/*}
-#echo $temp
 
 sudo sh -c "echo 'deb $temp/ $dir/'  >> /etc/apt/sources.list"
 sudo apt-get update
