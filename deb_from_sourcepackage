@@ -1,0 +1,75 @@
+#! /bin/bash
+
+#! /bin/bash
+
+while getopts "p:f:u:hc:" opt; do
+    case $opt in
+        p)
+            path=$OPTARG
+            ;;
+        f)
+            file=$OPTARG
+            ;;
+        u)
+            url=$OPTARG
+            ;;
+        h)
+            echo "Usage: <command name> <option1> <argument 1> <option2> <argument 2>"
+            echo "Options :"
+            echo "  -p    : path to the source"
+            echo "  -f    : control file"
+            echo "  -u    : url to the repository"
+            echo "  -c    : where under the repository you want to place the package "
+            echo "        : you can choose from stable | unstable | testing"
+            exit 0
+            ;;
+        c)
+            context=$OPTARG
+            if [ "$context" != "stable" ] && [ "$context" != "unstable" ] && [ "$context" != "testing" ]; then
+                echo "Invalid context"
+                exit 1
+            fi
+            ;;
+        \?)
+            echo "Invalid option: -$OPTARG"
+            exit 1
+            ;;
+        :)
+            echo "Option -$OPTARG requires an argument"
+            exit 1
+            ;;
+        esac
+done
+
+tar xf $path
+
+## suppose the path is /home/jayanth/Desktop/nginx-1.6.2.tar.gz
+#  then topath = /home/jayanth/Desktop/nginx-1.6.2.tar
+
+topath=$( echo ${path%.*} )
+
+
+## then finaltopath = /home/jayanth/Desktop/nginx-1.6.2
+
+finaltopath=$( echo ${topath%.*} )
+
+
+## then filename = nginx-1.6.2
+
+filename=$( echo ${finaltopath##*/})
+
+
+## then packagename = nginx
+
+packagename=$( echo ${filename%-*})
+
+cd $finaltopath
+dh_make -f $path
+
+cd debian
+rm control
+cp $file ./
+cd ..
+mv debian DEBIAN
+cd ..
+dpkg-deb --build $filename
