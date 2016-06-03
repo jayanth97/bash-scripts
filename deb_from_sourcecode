@@ -5,8 +5,13 @@ function create_debian {
     cd $dir
     hash dpkg 2> /dev/null || sudo apt-get -y install dpkg
     dpkg-deb --build $filename
+    packagename=$( grep "Package" "$filename/DEBIAN/control" | cut -d' ' -f2 )
+    packageversion=$( grep "Version" "$filename/DEBIAN/control" | cut -d' ' -f2 )
+    packagearchitecture=$( grep "Architecture" "$filename/DEBIAN/control" | cut -d' ' -f2 )
+    out=$(echo "$packagename"_"$packageversion"_"$packagearchitecture")
+    mv $filename.deb $out.deb
     hash s3cmd 2> /dev/null || sudo apt-get -y install s3cmd
-    s3cmd -P put $dir/$filename.deb $url/$context/
+    s3cmd -P put $dir/$out.deb $url/$context/
 }
 
 
