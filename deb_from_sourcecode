@@ -1,26 +1,34 @@
 #! /bin/bash
 
 function create_debian {
-    dir=$( echo ${path%/*} )
-    cd $dir
+    mkdir src
+    cd src
+    mkdir DEBIAN
+    mkdir -p usr/bin
+    cp $path usr/bin/
+    cp $file DEBIAN/
+    cd ..
     hash dpkg 2> /dev/null || sudo apt-get -y install dpkg
-    dpkg-deb --build $filename
-    packagename=$( grep "Package" "$filename/DEBIAN/control" | cut -d' ' -f2 )
-    packageversion=$( grep "Version" "$filename/DEBIAN/control" | cut -d' ' -f2 )
-    packagearchitecture=$( grep "Architecture" "$filename/DEBIAN/control" | cut -d' ' -f2 )
+    dpkg-deb --build src
+    packagename=$( grep "Package" "$file" | cut -d' ' -f2 )
+    packageversion=$( grep "Version" "$file" | cut -d' ' -f2 )
+    packagearchitecture=$( grep "Architecture" "$filename" | cut -d' ' -f2 )
     out=$(echo "$packagename"_"$packageversion"_"$packagearchitecture")
-    mv $filename.deb $out.deb
+    mv src.deb $out.deb
+    rm -rf src
     hash s3cmd 2> /dev/null || sudo apt-get -y install s3cmd
     s3cmd -P put $dir/$out.deb $url/$context/
 }
 
 
 #main
-
-while getopts "p:u:hc:" opt; do
+while getopts "p:f:u:hc:" opt; do
     case $opt in
         p)
             path=$OPTARG
+            ;;
+        f)
+            file=$OPTARG
             ;;
         u)
             url=$OPTARG
@@ -59,8 +67,8 @@ extension=${filename##*.}
 if [ "$extension" = 'deb' ]; then
     hash s3cmd 2> /dev/null || sudo apt-get -y install s3cmd
     s3cmd -P put $path $url/$context
-elif [ -d "$path" ]; then
+elif [ -f "$path" ]; then
     create_debian
 else
-    echo "Given path is not a directory nor a debian file"
+    echo "ERROR: Given path is not a file nor a debian file"
 fi
